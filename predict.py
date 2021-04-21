@@ -66,7 +66,7 @@ def evaluate():
     return caption
 
 for i in os.listdir(image_paths):
-    img = Image.open(os.path.join(image_paths,i))
+    image = Image.open(os.path.join(image_paths,i))
     image = coco.val_transform(image)
     image = image.unsqueeze(0)
     output = evaluate()
