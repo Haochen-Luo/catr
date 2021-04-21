@@ -1,5 +1,5 @@
 import torch
-
+import os
 from transformers import BertTokenizer
 from PIL import Image
 import argparse
@@ -8,10 +8,12 @@ from datasets import coco, utils
 from configuration import Config
 
 parser = argparse.ArgumentParser(description='Image Captioning')
-parser.add_argument('--path', type=str, help='path to image', required=True)
+parser.add_argument('--path', type=str, help='path to image', required=False)
+parser.add_argument('--paths', type=str, help='path to image', required=False)
 parser.add_argument('--v', type=str, help='version', default='v3')
 args = parser.parse_args()
 image_path = args.path
+image_paths = args.paths
 version = args.v
 
 if version == 'v1':
@@ -29,9 +31,8 @@ config = Config()
 start_token = tokenizer.convert_tokens_to_ids(tokenizer._cls_token)
 end_token = tokenizer.convert_tokens_to_ids(tokenizer._sep_token)
 
-image = Image.open(image_path)
-image = coco.val_transform(image)
-image = image.unsqueeze(0)
+
+
 
 
 def create_caption_and_mask(start_token, max_length):
@@ -64,8 +65,11 @@ def evaluate():
 
     return caption
 
-
-output = evaluate()
-result = tokenizer.decode(output[0].tolist(), skip_special_tokens=True)
-#result = tokenizer.decode(output[0], skip_special_tokens=True)
-print(result.capitalize())
+for i in os.listdir(image_paths):
+    img = Image.open(os.path.join(image_paths,i))
+    image = coco.val_transform(image)
+    image = image.unsqueeze(0)
+    output = evaluate()
+    result = tokenizer.decode(output[0].tolist(), skip_special_tokens=True)
+    #result = tokenizer.decode(output[0], skip_special_tokens=True)
+    print(result.capitalize())
